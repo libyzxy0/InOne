@@ -2,13 +2,19 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Image, Paperclip, Send, ChevronRight } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
+import { useSocket } from '@/hooks/useSocket';
 
 export function MessageBox() {
   const [message, setMessage] = useState("");
   const [hideActions, setHideActions] = useState(false);
-
+  const { sendMessage } = useSocket();
   const textareaRef = useRef(null);
 
+
+  const handleSend = async () => {
+    await sendMessage(message, "123");
+    setMessage("");
+  }
   useEffect(() => {
     if (message !== "") {
       setHideActions(true);
@@ -16,6 +22,8 @@ export function MessageBox() {
       setHideActions(false);
     }
   }, [message]);
+  
+  
   useEffect(() => {
     const textarea = textareaRef.current;
     const adjustHeight = () => {
@@ -66,6 +74,7 @@ export function MessageBox() {
       />
       <div>
         <Button
+          onClick={handleSend}
           className="disabled:opacity-50 hover:text-green-400 text-gray-800"
           variant="ghost"
         >

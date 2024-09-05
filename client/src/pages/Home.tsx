@@ -1,68 +1,109 @@
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import reactLogo from "@/assets/react.svg";
-import { cn } from "@/lib/utils";
-import React from "react";
+import {
+  Button
+} from "@/components/ui/button"
+import {
+  Link
+} from 'react-router-dom'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import {
+  Input
+} from "@/components/ui/input"
+import {
+  zodResolver
+} from "@hookform/resolvers/zod"
+import {
+  useForm
+} from "react-hook-form"
+import {
+  z
+} from "zod"
 
-type PropsWithChildren = {
-  children?: React.ReactNode;
-  className?: string;
-};
+const formSchema = z.object({
+  username: z.string().min(1, {
+    message: "Please enter your username or email.",
+  }),
+  password: z.string().min(1, {
+    message: "Please enter your password.",
+  }),
+})
 
-export const GlowBackground = ({ children, className }: PropsWithChildren) => (
-  <div className="relative">
-    <div
-      className={cn(`absolute inset-0 z-0`, className)}
-      style={{
-        background: `linear-gradient(120deg, #ffffff 40%, #e0f7ff 70%, #ffffff 100%)`,
-      }}
-    />
-    <div className="relative z-10 h-full">{children}</div>
-  </div>
-);
+export default function Login() {
+  const form = useForm < z.infer < typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+    },
+  })
 
-export default function Home() {
-  const [count, setCount] = useState(0);
+  function onSubmit(values: z.infer < typeof formSchema >) {
+    console.log(values)
+  }
+
   return (
-    <GlowBackground>
-      <div className="py-48 w-full flex justify-center items-center flex-col space-y-12 text-center">
-        <div className="space-y-3">
-          <h1 className="text-xl font-semibold font-mono">
-            React + Shadcn starter template.
-          </h1>
-          <p className="text-sm">
-            Made by{" "}
-            <a
-              className="hover:text-sky-400 hover:underline"
-              href="https://libyzxy0.com"
-            >
-              libyzxy0
-            </a>
-            .
-          </p>
+    <div className="flex items-center justify-center h-screen w-full bg-white">
+      <div className="max-w-md w-full px-7">
+        <div className="text-center">
+          <h1 className="text-2xl font-mono font-semibold">Login | InOne</h1>
         </div>
-        <div className="flex flex-row items-center space-x-8">
-          <img
-            src="https://seeklogo.com/images/S/shadcn-ui-logo-EF735EC0E5-seeklogo.com.png?v=638421451470000000"
-            className="h-20 w-20"
-          />
-          <h2 className="text-4xl font-bold">+</h2>
-          <img src={reactLogo} className="h-20 w-20" />
-        </div>
-        <h1>
-          Edit this file at{" "}
-          <code className="bg-sky-400 font-mono">src/pages/Home.tsx</code>
-        </h1>
-        <div className="flex flex-col items-center justify-center space-y-6">
-          <div className="flex flex-row items-center justify-center space-x-3">
-            <p>Count is</p> <Button variant="outline">{count}</Button>
-          </div>
 
-          <Button onClick={() => setCount(count + 1)} className="font-mono">
-            Click me
-          </Button>
+        <div className="mt-16">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username / Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="libyzxy0 / janlibydelacosta@gmail.com" {...field}/>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Mypassword@123" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full font-mono font-semibold">Login</Button>
+            </form>
+          </Form>
+          <p className="text-sm pt-5 text-center">Don't have an account? <Link to="/new-account" className="text-green-400 hover:underline">{"Let's Create"}</Link></p>
+          <div className="flex items-center flex-col w-full mt-8">
+            <h1 className="text-xl font-mono mb-8">OR</h1>
+
+            <Button
+              type="button"
+              className="w-full bg-gray-50 text-gray-800 hover:bg-gray-100 flex justify-center items-center space-x-2 shadow-sm font-mono"
+            >
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/archive/c/c1/20190923152039%21Google_%22G%22_logo.svg"
+                alt="Google logo"
+                className="h-5 w-5"
+              />
+              <span>Continue with Google</span>
+            </Button>
+          </div>
         </div>
       </div>
-    </GlowBackground>
-  );
+    </div>
+  )
 }
