@@ -2,19 +2,29 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Image, Paperclip, Send, ChevronRight } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
-import { useSocket } from '@/hooks/useSocket';
+import Cookies from 'js-cookie';
+import { useSocket } from "@/hooks/useSocket";
 
-export function MessageBox() {
+export function MessageBox({ threadID }: { threadID: string }) {
+  const token = Cookies.get('authtoken');
   const [message, setMessage] = useState("");
   const [hideActions, setHideActions] = useState(false);
-  const { sendMessage } = useSocket();
+  
+  const { sendMessage } = useSocket(threadID);
   const textareaRef = useRef(null);
-
-
+  
   const handleSend = async () => {
-    await sendMessage(message, "123");
+    await sendMessage({
+      text: message, 
+      attachment_url: "", 
+    }, token);
+    
+    /* Reset the textarea */
     setMessage("");
-  }
+    const textarea = textareaRef.current;
+    textarea.style.height = "auto";
+  };
+  
   useEffect(() => {
     if (message !== "") {
       setHideActions(true);
@@ -22,8 +32,7 @@ export function MessageBox() {
       setHideActions(false);
     }
   }, [message]);
-  
-  
+
   useEffect(() => {
     const textarea = textareaRef.current;
     const adjustHeight = () => {

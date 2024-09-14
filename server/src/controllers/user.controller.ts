@@ -6,14 +6,16 @@ import {
   getTokenFromRequestHeaders,
   getUserFromToken
 } from "@/utils";
+import * as bcryptjs from 'bcryptjs';
 import db from "@/db/drizzle";
 import {
   users
 } from "@/db/schema";
 import {
+  or,
   eq
-} from "drizzle-orm";
-import jwt from "jsonwebtoken";
+} from 'drizzle-orm';
+import * as jwt from "jsonwebtoken";
 import type {
   User
 } from '@/types'
@@ -31,19 +33,24 @@ class UserController {
         password
       } = req.body;
 
+      /* Let's hash password using bcryptjs */
+      const salt = bcryptjs.genSaltSync(10);
+      const hashedPassword = await bcryptjs.hash(password, salt);
+
       await db.insert(users).values({
         username,
         firstName,
         lastName,
         email,
-        authProvider: "email"
-        password,
+        authProvider: "email", 
+        password: hashedPassword,
       });
 
       res.status(200).json({
         message: "User created successfully",
       });
     } catch (error: any) {
+      console.log(error)
       res.status(500).send({
         message: "Something went wrong"
       });
@@ -56,10 +63,11 @@ class UserController {
         username,
         password
       } = req.body;
+
       const user: User[] = await db
       .select()
       .from(users)
-      .where(eq(users.username, username));
+      .where(or(eq(users.username, username), eq(users.email, username)));
 
       /* Check if user exists on database */
       if (user.length <= 0) {
@@ -68,14 +76,20 @@ class UserController {
           jwt_token: null,
         });
       }
-
+      
+      if(!user[0].password) return res.status(401).json({ success: false, message: 'Incorrect password [11002]', jwt_token: null });
+    
+      /* Compare hashed password using bcryptjs */
+      const isCorrectPass = await bcryptjs.compare(password, user[0].password);
+    
       /* Check if password match */
-      if (user[0].password !== password) {
+      if (!isCorrectPass) {
         return res.status(401).json({
           message: "Incorrect password",
           jwt_token: null,
         });
       }
+      
       const token = jwt.sign({
         id: user[0].id
       }, process.env.JWT_SECRET_KEY, {
@@ -87,6 +101,7 @@ class UserController {
         jwt_token: token,
       });
     } catch (error: any) {
+      console.log(error)
       res.status(500).send({
         message: "Something went wrong"
       });

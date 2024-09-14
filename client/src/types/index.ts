@@ -2,7 +2,7 @@ export type ReactionType = {
   reaction: string;
   userID: string;
   fullName: string;
-}
+};
 
 export type Message = {
   id: string;
@@ -20,8 +20,9 @@ export type User = {
   lastName: string;
   email: string;
   password: string;
-  status: 'online' | 'offline';
+  status: "online" | "offline";
   email_verified: boolean;
-  authProvider: 'email' | 'google';
+  authProvider: "email" | "google";
   created_at: string;
+  avatar_url: string | null;
 };

@@ -24,4 +24,5 @@ export type User = {
   email_verified: boolean;
   authProvider: 'email' | 'google';
   created_at: string;
+  avatar_url: string | null;
 };

@@ -12,7 +12,8 @@ type ReturnType = {
 } | null;
 
 export function useMergeReactions(reactions: ReactionType[]): ReturnType {
-  if (reactions === null || !reactions) return null;
+  if(!reactions) return null;
+  if (reactions.length == 0) return null;
   const reactionCounts: Record<string, number> = {};
   const uniqueReactions: ReactionType[] = [];
 

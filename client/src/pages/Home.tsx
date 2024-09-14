@@ -1,9 +1,8 @@
-import {
-  Button
-} from "@/components/ui/button"
-import {
-  Link
-} from 'react-router-dom'
+import { Button } from "@/components/ui/button";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from '@/hooks/useAuth'
+import { useState, useEffect } from 'react'
+import { LoaderCircle } from 'lucide-react'
 import {
   Form,
   FormControl,
@@ -12,20 +11,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import {
-  Input
-} from "@/components/ui/input"
-import {
-  zodResolver
-} from "@hookform/resolvers/zod"
-import {
-  useForm
-} from "react-hook-form"
-import {
-  z
-} from "zod"
-
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { toast } from "sonner"
 const formSchema = z.object({
   username: z.string().min(1, {
     message: "Please enter your username or email.",
@@ -33,19 +24,44 @@ const formSchema = z.object({
   password: z.string().min(1, {
     message: "Please enter your password.",
   }),
-})
+});
 
 export default function Login() {
-  const form = useForm < z.infer < typeof formSchema>>({
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const { user, login } = useAuth()
+  
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
+      password: ""
     },
-  })
+  });
 
-  function onSubmit(values: z.infer < typeof formSchema >) {
-    console.log(values)
+  async function onSubmit(v: z.infer<typeof formSchema>) {
+    try {
+      setLoading(true)
+      await login(v.username, v.password);
+      console.log("Login Success!!");
+      toast("✅ Successfully logged in.")
+      setTimeout(() => {
+        navigate('/chat')
+      }, 2000)
+    } catch (error) {
+      toast("❌ Failed to login " + error)
+      console.log("Login Error:", error)
+    } finally {
+      setLoading(false)
+    }
   }
+  
+  useEffect(() => {
+    if(user) {
+      navigate('/chat')
+    }
+  }, [user])
+  
 
   return (
     <div className="flex items-center justify-center h-screen w-full bg-white">
@@ -64,7 +80,10 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>Username / Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="libyzxy0 / janlibydelacosta@gmail.com" {...field}/>
+                      <Input
+                        placeholder="libyzxy0 / janlibydelacosta@gmail.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -77,16 +96,31 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="Mypassword@123" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="Mypassword@123"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full font-mono font-semibold">Login</Button>
+              <Button type="submit" className="w-full font-mono font-semibold">
+                {loading ? (
+                  <LoaderCircle className="h-5 w-5 animate-spin" />
+                 ) : (
+                 <span>Login</span>
+                 )}
+              </Button>
             </form>
           </Form>
-          <p className="text-sm pt-5 text-center">Don't have an account? <Link to="/new-account" className="text-green-400 hover:underline">{"Let's Create"}</Link></p>
+          <p className="text-sm pt-5 text-center">
+            Don't have an account?{" "}
+            <Link to="/new-account" className="text-green-400 hover:underline">
+              {"Let's Create"}
+            </Link>
+          </p>
           <div className="flex items-center flex-col w-full mt-8">
             <h1 className="text-xl font-mono mb-8">OR</h1>
 
@@ -105,5 +139,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  )
+  );
 }

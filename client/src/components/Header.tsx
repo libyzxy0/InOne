@@ -1,34 +1,65 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from 'react'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
+import axios from 'axios'
+import { API_BASE } from '@/constants'
 
-export function Header() {
+type Props = {
+  onChangeThread: () => string;
+  thread: string;
+}
+type ThreadType = {
+  id: string;
+  name: string;
+  photo: string;
+}
+
+export function Header({ onChangeThread, thread }: Props) {
+  const [threadList, setThreadList] = useState<ThreadType[] | null>(null)
+  
+  useEffect(() => {
+    const handleThreadFetch = async () => {
+      const response = await axios.get(API_BASE + '/get-all-thread')
+      setThreadList(response.data)
+      onChangeThread(response.data[0].id)
+    }
+    handleThreadFetch()
+  }, [])
+  
   return (
     <header className="w-full text-gray-100 py-2 px-6 flex items-center justify-between md:px-8 lg:px-10 fixed top-0 z-40 bg-white backdrop-filter backdrop-blur-md bg-opacity-30">
       <nav className="flex items-center gap-4">
         <Link to="#" className="font-bold text-lg text-gray-800 font-mono">
           InOne
         </Link>
-        <Link
-          to="#"
-          className="text-sm hover:underline font-mono text-gray-800"
-        >
-          Groups
-        </Link>
-        <Link
-          to="#"
-          className="text-sm hover:underline font-mono text-gray-800"
-        >
-          Updates
-        </Link>
+        <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <div variant="ghost" className="font-bold text-lg text-gray-800 font-mono">
+          <i className="text-green-400 capitalize">{threadList && (threadList.find(t => t.id === thread))?.name}</i>
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>Select Group</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuRadioGroup value={thread} onValueChange={onChangeThread}>
+          {threadList && threadList.map((thread, index) => (
+            <DropdownMenuRadioItem key={index} value={thread.id}>{thread.name}</DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
       </nav>
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" className="hidden md:block">
