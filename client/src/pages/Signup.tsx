@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from '@/hooks/useAuth'
-import { useState, useEffect } from 'react'
-import { LoaderCircle } from 'lucide-react'
+import { useAuth } from "@/hooks/useAuth";
+import { useState, useEffect } from "react";
+import { LoaderCircle } from "lucide-react";
+import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "sonner"
+import { toast } from "sonner";
 
 const formSchema = z.object({
   firstName: z.string().min(1, {
@@ -62,42 +62,40 @@ const formSchema = z.object({
 
 export default function Login() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "", 
-      lastName: "", 
+      firstName: "",
+      lastName: "",
       username: "",
-      email: "", 
-      password: ""
+      email: "",
+      password: "",
     },
   });
-  
+
   const { register, user } = useAuth();
 
   async function onSubmit(v: z.infer<typeof formSchema>) {
     try {
       setLoading(true);
       await register(v.firstName, v.lastName, v.username, v.email, v.password);
-      console.log("Register Success!!");
-      toast('✅ Successfully created account!')
+      toast("✅ Successfully created account!");
       setTimeout(() => {
-        navigate('/')
-      }, 2000)
+        navigate("/");
+      }, 2000);
     } catch (error) {
-      toast("❌ Failed to create account.")
-      console.log("Register Error:", error)
+      toast("❌ Failed to create account.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
-  
+
   useEffect(() => {
-    if(user) {
-      navigate('/chat')
+    if (user) {
+      navigate("/chat");
     }
-  }, [user])
+  }, [user]);
 
   return (
     <div className="flex items-center justify-center w-full bg-white">
@@ -156,19 +154,14 @@ export default function Login() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="picture"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Profile Picture</FormLabel>
-                    <FormControl>
-                      <Input type="file" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
+              <div>
+                <Label>Profile Picture</Label>
+                <div>
+                  <Input type="file" />
+                </div>
+              </div>
+
               <FormField
                 control={form.control}
                 name="email"
@@ -205,9 +198,9 @@ export default function Login() {
               <Button type="submit" className="w-full font-mono font-semibold">
                 {loading ? (
                   <LoaderCircle className="h-5 w-5 animate-spin" />
-                 ) : (
-                 <span>Create My Account</span>
-                 )}
+                ) : (
+                  <span>Create My Account</span>
+                )}
               </Button>
             </form>
           </Form>

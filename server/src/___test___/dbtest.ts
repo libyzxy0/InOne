@@ -7,7 +7,7 @@ import {
 (async function () {
   const usr = await db.select().from(users);
   const d = await db.insert(threads).values({
-    name: "MainThread", 
+    name: "General", 
     photo: "https://www.iconpacks.net/icons/1/free-icon-network-team-308.png", 
     created_by: usr[0].id
   }).returning({ insertedId: threads.id });

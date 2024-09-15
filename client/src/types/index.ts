@@ -4,11 +4,22 @@ export type ReactionType = {
   fullName: string;
 };
 
+export type Thread = {
+  name: string;
+  photo: string;
+  id: string;
+  created_at: string;
+  created_by: string;
+};
+
 export type Message = {
   id: string;
   message: string | null;
   attachmentUrl: string | null;
   reactions: ReactionType[];
+  user?: User | null;
+  thread?: Thread | null;
+  thread_id: string;
   user_id: string;
   created_at: string;
 };

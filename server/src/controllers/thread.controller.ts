@@ -6,9 +6,6 @@ import db from "@/db/drizzle";
 import {
   threads
 } from "@/db/schema";
-import {
-  eq
-} from 'drizzle-orm';
 
 class ThreadController {
   async createThread(req: Request, res: Response) {
@@ -16,8 +13,7 @@ class ThreadController {
     const user: User | null = await getUserFromToken(token);
     try {
       const {
-        name,
-        photo
+        name
       } = req.body;
 
       if (user) {
@@ -43,15 +39,13 @@ class ThreadController {
   }
   async getAllThread(req: Request, res: Response) {
     try {
-      const threadList = await db.select().from(threads);
-      let result = [];
-      for (let i = 0; i < threadList.length; i++) {
-        result.push({
-          name: threadList[i].name,
-          photo: threadList[i].photo,
-          id: threadList[i].id
-        })
-      }
+      const result = await db.query.threads.findMany({
+        columns: {
+          name: true,
+          photo: true,
+          id: true,
+        }
+      });
       return res.status(200).json(result);
     } catch (error) {
       console.log(error)
@@ -68,22 +62,27 @@ class ThreadController {
       const result = await db.query.threads.findMany({
         with: {
           messages: {
+            orderBy: (messages, {
+              asc
+            }) => [asc(messages.created_at)],
             with: {
               user: {
                 columns: {
-                  id: true, 
-                  firstName: true, 
-                  lastName: true, 
-                  avatar_url: true, 
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  avatar_url: true,
                   status: true
                 }
-              }
+              },
             }
           }
         },
-        where: ((threads, { eq }) => eq(threads.id, threadID)),
+        where: ((threads, {
+          eq
+        }) => eq(threads.id, threadID)),
       });
-      return res.status(200).json(result);
+      return res.status(200).send(result);
     } catch (error) {
       console.log(error)
       res.status(500).json({

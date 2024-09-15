@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/AuthContext";
-import PrivateRoutes from '@/routes/private-routes'
+import PrivateRoutes from "@/routes/private-routes";
 import Home from "@/pages/Home";
 import Chat from "@/pages/Chat";
 import Signup from "@/pages/Signup";

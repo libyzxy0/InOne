@@ -1,18 +1,11 @@
-import {
-  Outlet,
-  Navigate,
-} from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { LoaderCircle } from "lucide-react";
+import { LoadingScreen } from '@/components/LoadingScreen'
 
 const PrivateRoutes = () => {
   const { user, loading } = useAuth();
   if (loading) {
-    return (
-      <div className="min-h-[85vh] w-full flex justify-center items-center">
-        <LoaderCircle className="text-gray-800 animate-spin" size={35} />
-      </div>
-    );
+    return <LoadingScreen />
   }
   return user ? <Outlet /> : <Navigate to={`/`} />;
 };

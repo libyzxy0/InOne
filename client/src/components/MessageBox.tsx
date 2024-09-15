@@ -2,29 +2,38 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Image, Paperclip, Send, ChevronRight } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { useSocket } from "@/hooks/useSocket";
 
 export function MessageBox({ threadID }: { threadID: string }) {
-  const token = Cookies.get('authtoken');
+  const token = Cookies.get("authtoken") ? Cookies.get("authtoken") : null;
   const [message, setMessage] = useState("");
   const [hideActions, setHideActions] = useState(false);
-  
+
   const { sendMessage } = useSocket(threadID);
-  const textareaRef = useRef(null);
-  
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
   const handleSend = async () => {
-    await sendMessage({
-      text: message, 
-      attachment_url: "", 
-    }, token);
-    
-    /* Reset the textarea */
-    setMessage("");
-    const textarea = textareaRef.current;
-    textarea.style.height = "auto";
+    if (token) {
+      
+     /*
+       Let's use php to store data, using serv00 hosting 3gb
+     */
+      await sendMessage(
+        {
+          text: message,
+          attachment_url: "",
+        },
+        token,
+      );
+
+      /* Reset the textarea */
+      setMessage("");
+      const textarea = textareaRef.current;
+      textarea!.style.height = "auto";
+    }
   };
-  
+
   useEffect(() => {
     if (message !== "") {
       setHideActions(true);
@@ -35,15 +44,22 @@ export function MessageBox({ threadID }: { threadID: string }) {
 
   useEffect(() => {
     const textarea = textareaRef.current;
+    
     const adjustHeight = () => {
-      textarea.style.height = "auto";
-      textarea.style.height = `${textarea.scrollHeight}px`;
+      if (textarea !== null) {
+        textarea!.style.height = "auto";
+        textarea!.style.height = `${textarea.scrollHeight}px`;
+      }
     };
 
-    textarea.addEventListener("input", adjustHeight);
+    if (textarea !== null) {
+      textarea!.addEventListener("input", adjustHeight);
+    }
 
     return () => {
-      textarea.removeEventListener("input", adjustHeight);
+      if (textarea != null) {
+        textarea!.removeEventListener("input", adjustHeight);
+      }
     };
   }, []);
 
@@ -75,7 +91,7 @@ export function MessageBox({ threadID }: { threadID: string }) {
 
       <Textarea
         ref={textareaRef}
-        placeholder="Type your message..."
+        placeholder="Type what you think..."
         className="flex-1 rounded-lg bg-gray-200 text-gray-800 border-none focus:ring-0 focus:outline-none resize-none min-h-[40px] max-h-[90px] overflow-auto focus-visible:ring-green-400 pt-2.5"
         rows={1}
         value={message}

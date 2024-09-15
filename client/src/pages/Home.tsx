@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from '@/hooks/useAuth'
-import { useState, useEffect } from 'react'
-import { LoaderCircle } from 'lucide-react'
+import { useAuth } from "@/hooks/useAuth";
+import { useState, useEffect } from "react";
+import { LoaderCircle } from "lucide-react";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "sonner"
+import { toast } from "sonner";
 const formSchema = z.object({
   username: z.string().min(1, {
     message: "Please enter your username or email.",
@@ -27,41 +26,38 @@ const formSchema = z.object({
 });
 
 export default function Login() {
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
-  const { user, login } = useAuth()
-  
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const { user, login } = useAuth();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
-      password: ""
+      password: "",
     },
   });
 
   async function onSubmit(v: z.infer<typeof formSchema>) {
     try {
-      setLoading(true)
+      setLoading(true);
       await login(v.username, v.password);
-      console.log("Login Success!!");
-      toast("✅ Successfully logged in.")
+      toast("✅ Successfully logged in.");
       setTimeout(() => {
-        navigate('/chat')
-      }, 2000)
+        navigate("/chat");
+      }, 2000);
     } catch (error) {
-      toast("❌ Failed to login " + error)
-      console.log("Login Error:", error)
+      toast("❌ Failed to login " + error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
-  
+
   useEffect(() => {
-    if(user) {
-      navigate('/chat')
+    if (user) {
+      navigate("/chat");
     }
-  }, [user])
-  
+  }, [user]);
 
   return (
     <div className="flex items-center justify-center h-screen w-full bg-white">
@@ -109,9 +105,9 @@ export default function Login() {
               <Button type="submit" className="w-full font-mono font-semibold">
                 {loading ? (
                   <LoaderCircle className="h-5 w-5 animate-spin" />
-                 ) : (
-                 <span>Login</span>
-                 )}
+                ) : (
+                  <span>Login</span>
+                )}
               </Button>
             </form>
           </Form>

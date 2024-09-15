@@ -1,15 +1,26 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Copy, Pencil, MessageSquareOff } from "lucide-react";
+
+/* Tenks to this f*cking library https://usehooks.com/uselongpress 🙏 */
+import { useLongPress } from "@uidotdev/usehooks"
+
+import {
+  Copy,
+  Pencil,
+  MessageSquareOff,
+  MessageSquareReply,
+} from "lucide-react";
 import { useMergeReactions } from "@/hooks/useMergeReactions";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import useLongPress from "@/hooks/useLongPress";
-
+import { useReaction } from "@/hooks/useSocket";
+import Cookies from "js-cookie";
 import {
   Drawer,
   DrawerFooter,
   DrawerContent,
   DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
 } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -25,28 +36,38 @@ type MessageSelfProps = {
   children: React.ReactNode;
   time: string;
   reactions: ReactionType[];
+  messageID: string;
+  threadID: string;
 };
 
 type MessageProps = {
   children: React.ReactNode;
   time: string;
-  name: string;
-  avatarUrl: string;
+  firstName: string | null;
+  lastName: string | null;
+  avatarUrl: string | null;
   reactions: ReactionType[];
+  messageID: string;
+  threadID: string;
 };
 
 type MessageAttachmentProps = {
   fileUrl: string;
   time: string;
-  name: string;
+  firstName: string | null;
+  lastName: string | null;
   avatarUrl: string;
   reactions: ReactionType[];
+  messageID: string;
+  threadID: string;
 };
 
 type MessageSelfAttachmentProps = {
   fileUrl: string;
   time: string;
   reactions: ReactionType[];
+  messageID: string;
+  threadID: string;
 };
 
 type MergeReactionsReturnType = {
@@ -56,7 +77,13 @@ type MergeReactionsReturnType = {
   reactions: ReactionType[];
 } | null;
 
-export function MessageSelf({ children, time, reactions }: MessageSelfProps) {
+export function MessageSelf({
+  messageID,
+  threadID,
+  children,
+  time,
+  reactions,
+}: MessageSelfProps) {
   const reactsData: MergeReactionsReturnType | null =
     useMergeReactions(reactions);
   return (
@@ -64,19 +91,26 @@ export function MessageSelf({ children, time, reactions }: MessageSelfProps) {
       <div className="flex justify-end items-start gap-3 select-none max-w-[90%]">
         <div className="flex flex-col items-end max-w-full">
           <div className="text-xs text-gray-600 mb-1 flex flex-row space-x-2">
-          <p className="font-mono font-semibold">You</p>
-          <span>•</span>
-          <span className="font-mono">{time}</span>
+            <p className="font-mono font-semibold">You</p>
+            <span>•</span>
+            <span className="font-mono">{time}</span>
           </div>
-          <MessageBubbleEventWrapper className="w-fit">
+          <MessageBubbleEventWrapper
+            isSelf={true}
+            messageID={messageID}
+            threadID={threadID}
+            className="w-fit"
+          >
             <div className="relative bg-green-500 text-gray-100 rounded-2xl p-3 rounded-br-none inline-block max-w-max">
               <p className="text-sm">
-                {children && children.split("\n").map((line, index) => (
-                  <span key={index}>
-                    {line}
-                    <br />
-                  </span>
-                ))}
+                {children &&
+                  typeof children == "string" &&
+                  children.split("\n").map((line: string, index: number) => (
+                    <span key={index}>
+                      {line}
+                      <br />
+                    </span>
+                  ))}
               </p>
               {!!reactions && reactions.length > 0 && (
                 <div className="absolute -bottom-3 left-0 bg-gray-200 rounded-full px-2 space-x-1 text-sm py-1 flex flex-row justify-center items-center text-xs">
@@ -99,9 +133,12 @@ export function MessageSelf({ children, time, reactions }: MessageSelfProps) {
 }
 
 export function Message({
+  messageID,
+  threadID,
   children,
   time,
-  name,
+  firstName,
+  lastName,
   avatarUrl,
   reactions,
 }: MessageProps) {
@@ -109,43 +146,55 @@ export function Message({
     useMergeReactions(reactions);
   return (
     <div className="w-full flex justify-start">
-    <div className="flex items-start gap-3 select-none max-w-[90%]">
-      <Avatar className="w-8 h-8 border">
-        <AvatarImage src={avatarUrl} alt={name} />
-        <AvatarFallback>JD</AvatarFallback>
-      </Avatar>
-      <div className="flex flex-col max-w-full">
-        <div className="text-xs text-gray-600 mb-1 flex flex-row space-x-2">
-          <p className="font-mono font-semibold">{name}</p>
-          <span>•</span>
-          <span className="font-mono">{time}</span>
-        </div>
-        <MessageBubbleEventWrapper className="w-fit">
-          <div className="relative bg-gray-200 text-gray-800 rounded-2xl p-3 rounded-tl-none inline-block max-w-max">
-              <p className="break-words text-sm">
-                {children && children.split("\n").map((line, index) => (
-                  <span key={index}>
-                    {line}
-                    <br />
-                  </span>
-                ))}
-              </p>
-            {!!reactions && reactions.length > 0 && (
-              <div className="absolute -bottom-3 right-0 bg-green-400 rounded-full px-2 space-x-1 text-sm py-1 flex flex-row justify-center items-center text-xs">
-                {reactions &&
-                  reactsData &&
-                  reactsData.uniqueReactions.map((reacts, index) => (
-                    <span key={index}>{reacts.reaction}</span>
-                  ))}
-                <span className="text-gray-800">
-                  {reactsData && reactsData.length}
-                </span>
-              </div>
-            )}
+      <div className="flex items-start gap-3 select-none max-w-[90%]">
+        <Avatar className="w-8 h-8 border">
+          <AvatarImage
+            src={avatarUrl ? avatarUrl : "https://http.cat/404"}
+            alt={firstName || "Avatar"}
+          />
+          <AvatarFallback>JD</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col max-w-full">
+          <div className="text-xs text-gray-600 mb-1 flex flex-row space-x-2">
+            <p className="font-mono font-semibold">
+              {firstName + " " + lastName}
+            </p>
+            <span>•</span>
+            <span className="font-mono">{time}</span>
           </div>
-        </MessageBubbleEventWrapper>
+          <MessageBubbleEventWrapper
+            messageID={messageID}
+            threadID={threadID}
+            isSelf={false}
+            className="w-fit"
+          >
+            <div className="relative bg-gray-200 text-gray-800 rounded-2xl p-3 rounded-tl-none inline-block max-w-max">
+              <p className="break-words text-sm">
+                {children &&
+                  typeof children == "string" &&
+                  children.split("\n").map((line: string, index: number) => (
+                    <span key={index}>
+                      {line}
+                      <br />
+                    </span>
+                  ))}
+              </p>
+              {!!reactions && reactions.length > 0 && (
+                <div className="absolute -bottom-3 right-0 bg-green-400 rounded-full px-2 space-x-1 text-sm py-1 flex flex-row justify-center items-center text-xs">
+                  {reactions &&
+                    reactsData &&
+                    reactsData.uniqueReactions.map((reacts, index) => (
+                      <span key={index}>{reacts.reaction}</span>
+                    ))}
+                  <span className="text-gray-800">
+                    {reactsData && reactsData.length}
+                  </span>
+                </div>
+              )}
+            </div>
+          </MessageBubbleEventWrapper>
+        </div>
       </div>
-    </div>
     </div>
   );
 }
@@ -153,25 +202,37 @@ export function Message({
 export function MessageAttachment({
   fileUrl,
   time,
-  name,
+  firstName,
+  lastName,
   avatarUrl,
   reactions,
+  messageID,
+  threadID,
 }: MessageAttachmentProps) {
   const reactsData: MergeReactionsReturnType | null =
     useMergeReactions(reactions);
   return (
     <div className="flex items-start gap-3 select-none">
       <Avatar className="w-8 h-8 border">
-        <AvatarImage src={avatarUrl} alt={name} />
+        <AvatarImage
+          src={avatarUrl ? avatarUrl : "https://http.cat/404"}
+          alt={firstName || "Avatar"}
+        />
         <AvatarFallback>JD</AvatarFallback>
       </Avatar>
       <div className="flex flex-col max-w-full">
         <div className="text-xs text-gray-600 mb-1">
-          <p className="font-mono font-semibold">{name}</p>
+          <p className="font-mono font-semibold">
+            {firstName + " " + lastName}
+          </p>
           <span>•</span>
           <span className="font-mono">{time}</span>
         </div>
-        <MessageBubbleEventWrapper>
+        <MessageBubbleEventWrapper
+          messageID={messageID}
+          threadID={threadID}
+          isSelf={false}
+        >
           <div className="relative text-gray-800 rounded-2xl rounded-tl-none inline-block max-w-max">
             <img
               onContextMenu={(e) => e.preventDefault()}
@@ -202,6 +263,8 @@ export function MessageSelfAttachment({
   fileUrl,
   time,
   reactions,
+  messageID,
+  threadID,
 }: MessageSelfAttachmentProps) {
   const reactsData: MergeReactionsReturnType | null =
     useMergeReactions(reactions);
@@ -211,7 +274,11 @@ export function MessageSelfAttachment({
         <div className="text-xs text-gray-600 mb-1 text-right font-mono">
           {time}
         </div>
-        <MessageBubbleEventWrapper>
+        <MessageBubbleEventWrapper
+          messageID={messageID}
+          threadID={threadID}
+          isSelf={true}
+        >
           <div className="relative text-gray-100 rounded-2xl rounded-br-none inline-block max-w-max">
             <img
               onContextMenu={(e) => e.preventDefault()}
@@ -241,24 +308,32 @@ export function MessageSelfAttachment({
 const MessageBubbleEventWrapper = ({
   children,
   className,
+  messageID,
+  threadID,
+  isSelf,
 }: {
   children: React.ReactNode;
   className?: string;
+  messageID: string;
+  threadID: string;
+  isSelf: boolean;
 }) => {
+  const token = Cookies.get("authtoken");
   const [popup, setPopup] = useState(false);
+  const { makeReact } = useReaction(threadID);
+  
+  const bindLongPress = useLongPress(
+    () => {
+      setPopup(true);
+    }, { threshold: 400 }
+  );
 
-  const onLongPress = () => {
-    setPopup(true);
+  const makeReaction = async (reaction: string) => {
+    if (token) {
+      setPopup(false);
+      makeReact(reaction, messageID, token);
+    }
   };
-
-  const defaultOptions = {
-    shouldPreventDefault: true,
-    delay: 500,
-  };
-
-  const dummyFunc = () => {};
-
-  const longPressEvent = useLongPress(onLongPress, dummyFunc, defaultOptions);
 
   useEffect(() => {
     if (!popup) {
@@ -268,29 +343,62 @@ const MessageBubbleEventWrapper = ({
 
   return (
     <>
-      <div {...longPressEvent} className={cn("w-fit", className)}>
+      <button {...bindLongPress} className={cn("w-fit", className)}>
         {children}
-      </div>
+      </button>
 
       <Drawer open={popup} onOpenChange={setPopup}>
         <DrawerContent>
-          <DrawerHeader className="grid grid-cols-6">
-            <Button variant="ghost" className="text-2xl">
+          <DrawerHeader className="grid grid-cols-7">
+            <DrawerTitle className="hidden"></DrawerTitle>
+            <DrawerDescription className="hidden"></DrawerDescription>
+            <Button
+              variant="ghost"
+              className="text-2xl"
+              onClick={() => makeReaction("💙")}
+            >
               💙
             </Button>
-            <Button variant="ghost" className="text-2xl">
+            <Button
+              variant="ghost"
+              className="text-2xl"
+              onClick={() => makeReaction("😂")}
+            >
               😂
             </Button>
-            <Button variant="ghost" className="text-2xl">
+            <Button
+              variant="ghost"
+              className="text-2xl"
+              onClick={() => makeReaction("😢")}
+            >
               😢
             </Button>
-            <Button variant="ghost" className="text-2xl">
+            <Button
+              variant="ghost"
+              className="text-2xl"
+              onClick={() => makeReaction("😮")}
+            >
+              😮
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-2xl"
+              onClick={() => makeReaction("😡")}
+            >
               😡
             </Button>
-            <Button variant="ghost" className="text-2xl">
+            <Button
+              variant="ghost"
+              className="text-2xl"
+              onClick={() => makeReaction("👍")}
+            >
               👍
             </Button>
-            <Button variant="ghost" className="text-2xl">
+            <Button
+              variant="ghost"
+              className="text-2xl"
+              onClick={() => makeReaction("👎")}
+            >
               👎
             </Button>
           </DrawerHeader>
@@ -312,15 +420,24 @@ const MessageBubbleEventWrapper = ({
                 variant="ghost"
                 className="space-x-2 flex justify-center items-center"
               >
-                <Pencil className="w-5 h-5" />
-                <span>Edit</span>
+                {isSelf ? (
+                  <>
+                    <Pencil className="w-5 h-5" />
+                    <span>Edit</span>
+                  </>
+                ) : (
+                  <>
+                    <MessageSquareReply className="w-5 h-5" />
+                    <span>Reply</span>
+                  </>
+                )}
               </Button>
               <Button
                 variant="ghost"
                 className="space-x-2 flex justify-center items-center"
               >
                 <MessageSquareOff className="w-5 h-5" />
-                <span>Unsend</span>
+                {isSelf ? <span>Unsend</span> : <span>Remove</span>}
               </Button>
             </DrawerFooter>
           </div>
