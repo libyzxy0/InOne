@@ -1,13 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Image, Paperclip, Send, ChevronRight } from "lucide-react";
+import { Image, Paperclip, Send, ChevronRight, LoaderCircle } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useSocket } from "@/hooks/useSocket";
+import FileUpload from '@/components/FileUpload'
 
 export function MessageBox({ threadID }: { threadID: string }) {
   const token = Cookies.get("authtoken") ? Cookies.get("authtoken") : null;
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [attachmentUrl, setAttachmentUrl] = useState<string | null>(null);
   const [hideActions, setHideActions] = useState(false);
 
   const { sendMessage } = useSocket(threadID);
@@ -15,25 +18,30 @@ export function MessageBox({ threadID }: { threadID: string }) {
 
   const handleSend = async () => {
     if (token) {
-      
-     /*
-       Let's use php to store data, using serv00 hosting 3gb
-     */
+   
       await sendMessage(
         {
-          text: message,
-          attachment_url: "",
+          text: message !== "" ? message : null,
+          attachment_url: attachmentUrl,
         },
         token,
       );
 
-      /* Reset the textarea */
+      /* Reset the message box */
       setMessage("");
+      setAttachmentUrl(null)
       const textarea = textareaRef.current;
       textarea!.style.height = "auto";
     }
   };
-
+  
+  const handleUploadResponse = (data: { error: string | null; file_url: string | null; }) => {
+    setLoading(false)
+    if(!data.error) {
+      setAttachmentUrl(data.file_url)
+    }
+  };
+  
   useEffect(() => {
     if (message !== "") {
       setHideActions(true);
@@ -82,10 +90,12 @@ export function MessageBox({ threadID }: { threadID: string }) {
             <Paperclip className="w-5 h-5 text-gray-800" />
             <span className="sr-only">Attach file</span>
           </Button>
+          <FileUpload onUploadResponse={handleUploadResponse} onUploadStart={() => setLoading(true)}>
           <Button variant="ghost" size="icon">
-            <Image className="w-5 h-5 text-gray-800" />
+            {loading ? <LoaderCircle className="w-5 h-5 animate-spin" /> : <Image className={`w-5 h-5 text-gray-800 ${attachmentUrl ? 'text-green-400' : 'text-gray-800'}`} />}
             <span className="sr-only">Upload image</span>
           </Button>
+          </FileUpload>
         </div>
       )}
 

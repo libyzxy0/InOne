@@ -56,7 +56,7 @@ type MessageAttachmentProps = {
   time: string;
   firstName: string | null;
   lastName: string | null;
-  avatarUrl: string;
+  avatarUrl: string | null;
   reactions: ReactionType[];
   messageID: string;
   threadID: string;
@@ -343,9 +343,9 @@ const MessageBubbleEventWrapper = ({
 
   return (
     <>
-      <button {...bindLongPress} className={cn("w-fit", className)}>
+      <div {...bindLongPress} className={cn("w-fit", className)}>
         {children}
-      </button>
+      </div>
 
       <Drawer open={popup} onOpenChange={setPopup}>
         <DrawerContent>

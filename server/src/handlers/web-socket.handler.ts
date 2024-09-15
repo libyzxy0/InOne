@@ -79,6 +79,7 @@ export const socketHandler = (io) => {
 
     socket.on('make-reaction',
       async (data) => {
+        console.log(data)
         const user: User | null = await getUserFromToken(data.user_token);
         const [msgs] = await db.select().from(messages).where(eq(messages.id, data.messageID));
 

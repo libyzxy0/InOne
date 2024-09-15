@@ -19,8 +19,8 @@ import type {
 } from "@/types";
 
 type SendMessageType = {
-  text: string;
-  attachment_url: string;
+  text: string | null;
+  attachment_url: string | null;
 };
 
 type SocketReactionType = {
@@ -104,7 +104,7 @@ export const useSocket = (threadID: string) => {
 
 
   const handleNewReaction = async (reaction: SocketReactionType) => {
-    console.log('New reaction')
+    console.log('A user reacted!')
     const newReaction = {
       reaction: reaction.reaction,
       fullName: reaction.fullName,
