@@ -1,4 +1,8 @@
 import React, { useRef } from 'react';
+import { API_BASE } from '@/constants'
+const BASE_UPLOAD_API = `${API_BASE}/file-api`; 
+
+//https://libyzxy0.serv00.net
 
 interface FileUploadProps {
   onUploadResponse: (response: { file_url: string | null; error: string | null }) => void;
@@ -18,7 +22,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadResponse, children, onU
         formData.append('file', file);
         onUploadStart();
         
-        const response = await fetch('https://libyzxy0.serv00.net/upload.php', {
+        const response = await fetch(`${BASE_UPLOAD_API}/upload`, {
           method: 'POST',
           body: formData,
         });
@@ -29,7 +33,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadResponse, children, onU
 
         const result = await response.json();
         onUploadResponse({
-          file_url: `https://libyzxy0.serv00.net/get_file.php?file=${result.filename}`,
+          file_url: `${result.file_url}`,
           error: null
         });
       } catch (error) {

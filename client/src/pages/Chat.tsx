@@ -10,6 +10,12 @@ import {
   MessagesLayout
 } from "@/layouts/MessagesLayout";
 import {
+  ThreadMessageEmpty
+} from '@/components/ThreadMessageEmpty'
+import {
+  ThreadMessageLoading
+} from '@/components/ThreadMessageLoading'
+import {
   MessageSelf,
   MessageSelfAttachment,
   MessageAttachment,
@@ -33,7 +39,6 @@ import type {
 import type {
   User
 } from "@/types";
-
 
 function MessageSelfWrapper({
   data
@@ -87,6 +92,7 @@ function MessageSelfWrapper({
     return null;
   }
 }
+
 function MessageWrapper({
   data
 }: {
@@ -161,7 +167,8 @@ export default function Chat() {
   } = useAuth();
   const {
     messages,
-    signalToScroll
+    signalToScroll,
+    pending
   } = useSocket(threadID);
 
   const messagesEndRef = useRef < HTMLDivElement > (null);
@@ -179,20 +186,28 @@ export default function Chat() {
     [signalToScroll]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className={`flex flex-col ${messages.length > 0 && 'h-screen'} bg-white`}>
       <Header thread={threadID} onChangeThread={setThreadID} />
-      <MessagesLayout>
-        {messages &&
-        messages.map((data: MessageType, index: number) =>
-          data.user_id === user?.id ? (
-            <MessageSelfWrapper key={index} data={data} />
-          ): (
-            <MessageWrapper key={index} data={data} />
-          ),
-        )}
 
-        <div ref={messagesEndRef} className="h-16" />
-      </MessagesLayout>
+
+      {pending ? (
+        <ThreadMessageLoading />
+      ): messages?.length > 0 ? (
+        <MessagesLayout>
+          {messages.map((data: MessageType, index: number) =>
+            data.user_id === user?.id ? (
+              <MessageSelfWrapper key={index} data={data} />
+            ): (
+              <MessageWrapper key={index} data={data} />
+            ),
+          )}
+          <div ref={messagesEndRef} className="h-16" />
+        </MessagesLayout>
+      ): (
+        <ThreadMessageEmpty />
+      )}
+
+
       <MessageBox threadID={threadID} />
     </div>
   );

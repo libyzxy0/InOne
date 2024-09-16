@@ -56,6 +56,7 @@ export const useReaction = (threadID: string) => {
 export const useSocket = (threadID: string) => {
   const [messages,
     setMessages] = useState < Message[] > ([]);
+  const [pending, setPending] = useState(true)
   const [signalToScroll,
     setSignalScroll] = useState("");
   const {
@@ -87,12 +88,15 @@ export const useSocket = (threadID: string) => {
 
   const fetchMessages = async () => {
     try {
+      setPending(true)
       const response = await axios.get(`${API_BASE}/get-thread/${threadID}`);
       const msgsArray: Message[] = response.data[0]["messages"];
       setMessages(msgsArray);
       setSignalScroll(Math.random().toString(36).substring(2, 5));
     } catch (error) {
       console.log(error);
+    } finally {
+      setPending(false)
     }
   };
 
@@ -139,6 +143,7 @@ export const useSocket = (threadID: string) => {
   return {
     sendMessage,
     messages,
+    pending, 
     signalToScroll,
   };
 };

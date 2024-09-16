@@ -72,7 +72,7 @@ export function MessageBox({ threadID }: { threadID: string }) {
   }, []);
 
   return (
-    <div className="bg-gray-100 border-t px-4 py-3 flex items-center gap-3 md:px-6 lg:px-8 fixed bottom-0 w-full md:w-[60%]">
+    <div className="bg-white border-t px-4 py-3 flex items-center gap-3 md:px-6 lg:px-8 fixed bottom-0 w-full md:w-[60%]">
       {hideActions ? (
         <div className="flex text-gray-800">
           <Button
@@ -102,7 +102,7 @@ export function MessageBox({ threadID }: { threadID: string }) {
       <Textarea
         ref={textareaRef}
         placeholder="Type what you think..."
-        className="flex-1 rounded-lg bg-gray-200 text-gray-800 border-none focus:ring-0 focus:outline-none resize-none min-h-[40px] max-h-[90px] overflow-auto focus-visible:ring-green-400 pt-2.5"
+        className="flex-1 rounded-lg bg-gray-100 text-gray-800 border-none focus:ring-0 focus:outline-none resize-none min-h-[40px] max-h-[90px] overflow-auto focus-visible:ring-green-400 pt-2.5"
         rows={1}
         value={message}
         onChange={(e) => setMessage(e.target.value)}

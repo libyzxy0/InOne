@@ -69,8 +69,6 @@ export const socketHandler = (io) => {
             user_id: user.id
           });
 
-          console.log(`Message sent to room ${data.threadID}`);
-
         } catch (error) {
           console.error("Error handling sendMessage event:", error);
         }
@@ -79,7 +77,6 @@ export const socketHandler = (io) => {
 
     socket.on('make-reaction',
       async (data) => {
-        console.log(data)
         const user: User | null = await getUserFromToken(data.user_token);
         const [msgs] = await db.select().from(messages).where(eq(messages.id, data.messageID));
 
@@ -96,7 +93,6 @@ export const socketHandler = (io) => {
                 reaction: data.reaction,
               };
 
-              console.log('Emit updated reaction');
               io.to(data.threadID).emit('new-reaction', {
                 messageID: data.messageID,
                 fullName: `${user.firstName} ${user.lastName}`,
