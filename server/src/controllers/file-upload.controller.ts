@@ -16,7 +16,7 @@ class FileUploadController {
       const result = await uploadToCloudinary(req.file.buffer);
 
       res.status(200).json({
-        file_url: result.url, 
+        file_url: result.secure_url, 
         resource_type: result.resource_type, 
         format: result.format
       });
