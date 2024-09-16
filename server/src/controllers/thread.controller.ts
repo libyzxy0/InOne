@@ -13,13 +13,14 @@ class ThreadController {
     const user: User | null = await getUserFromToken(token);
     try {
       const {
-        name
+        name, 
+        isPrivate
       } = req.body;
 
       if (user) {
         await db.insert(threads).values({
           name,
-          name,
+          photo,
           created_by: user.id
         });
         res.status(200).json({

@@ -65,7 +65,7 @@ export const useSocket = (threadID: string) => {
 
   useEffect(() => {
     if (!threadID) return;
-
+    Cookies.set("thread", threadID, { expires: 30 });
     socket.emit("join-thread", {
       threadID,
       userToken: Cookies.get("authtoken"),

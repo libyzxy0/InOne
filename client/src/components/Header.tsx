@@ -15,6 +15,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
 import axios from "axios";
 import { API_BASE } from "@/constants";
+import Cookies from "js-cookie";
 
 type Props = {
   onChangeThread: (v: string) => void;
@@ -33,7 +34,8 @@ export function Header({ onChangeThread, thread }: Props) {
     const handleThreadFetch = async () => {
       const response = await axios.get(API_BASE + "/get-all-thread");
       setThreadList(response.data);
-      onChangeThread(response.data[0].id);
+      const thread = Cookies.get("thread");
+      onChangeThread(thread || response.data[0].id);
     };
     handleThreadFetch();
   }, []);
