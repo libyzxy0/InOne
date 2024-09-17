@@ -80,7 +80,7 @@ export function MessageBox({ threadID }: { threadID: string }) {
   }, []);
 
   return (
-    <div className="bg-white border-t px-4 py-3 flex items-center gap-3 md:px-6 lg:px-8 fixed bottom-0 w-full md:w-[60%]">
+    <div className="bg-gray-50 dark:bg-[#0f0f0f] dark:border-gray-800 border-t px-4 py-3 flex items-center gap-3 md:px-6 lg:px-8 fixed bottom-0 w-full md:w-[60%]">
       {hideActions ? (
         <div className="flex text-gray-800">
           <Button
@@ -95,7 +95,7 @@ export function MessageBox({ threadID }: { threadID: string }) {
       ) : (
         <div className="flex gap-1">
           <Button variant="ghost" size="icon">
-            <Paperclip className="w-5 h-5 text-gray-800" />
+            <Paperclip className="w-5 h-5 text-gray-800 dark:text-white" />
             <span className="sr-only">Attach file</span>
           </Button>
           <FileUpload
@@ -104,10 +104,10 @@ export function MessageBox({ threadID }: { threadID: string }) {
           >
             <Button variant="ghost" size="icon">
               {loading ? (
-                <LoaderCircle className="w-5 h-5 animate-spin" />
+                <LoaderCircle className="w-5 h-5 animate-spin dark:text-white" />
               ) : (
                 <Image
-                  className={`w-5 h-5 text-gray-800 ${attachmentUrl ? "text-green-400" : "text-gray-800"}`}
+                  className={`w-5 h-5 text-gray-800 dark:text-white ${attachmentUrl ? "text-green-400" : "text-gray-800"}`}
                 />
               )}
               <span className="sr-only">Upload image</span>
@@ -119,7 +119,7 @@ export function MessageBox({ threadID }: { threadID: string }) {
       <Textarea
         ref={textareaRef}
         placeholder="Type what you think..."
-        className="flex-1 rounded-lg bg-gray-100 text-gray-800 border-none focus:ring-0 focus:outline-none resize-none min-h-[40px] max-h-[90px] overflow-auto focus-visible:ring-green-400 pt-2.5"
+        className="flex-1 rounded-lg bg-gray-100 dark:bg-[#0f0f0f] text-gray-800 dark:text-white border-none focus:ring-0 focus:outline-none resize-none min-h-[40px] max-h-[90px] overflow-auto focus-visible:ring-green-400 pt-2.5"
         rows={1}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
@@ -127,7 +127,7 @@ export function MessageBox({ threadID }: { threadID: string }) {
       <div>
         <Button
           onClick={handleSend}
-          className="disabled:opacity-50 hover:text-green-400 text-gray-800"
+          className="disabled:opacity-50 hover:text-green-400 text-gray-800 dark:text-white"
           variant="ghost"
         >
           <Send className="w-5 h-5" />

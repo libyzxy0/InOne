@@ -156,7 +156,7 @@ export function Message({
           <AvatarFallback>JD</AvatarFallback>
         </Avatar>
         <div className="flex flex-col max-w-full">
-          <div className="text-xs text-gray-600 mb-1 flex flex-row space-x-2">
+          <div className="text-xs dark:text-gray-400 text-gray-600 mb-1 flex flex-row space-x-2">
             <p className="font-mono font-semibold">
               {firstName + " " + lastName}
             </p>
@@ -169,7 +169,7 @@ export function Message({
             isSelf={false}
             className="w-fit"
           >
-            <div className="relative bg-gray-200 text-gray-800 rounded-2xl p-3 rounded-tl-none inline-block max-w-max">
+            <div className="relative bg-gray-200 dark:bg-gray-700 dark:text-white text-gray-800 rounded-2xl p-3 rounded-tl-none inline-block max-w-max">
               <p className="break-words text-sm">
                 {children &&
                   typeof children == "string" &&
@@ -223,7 +223,7 @@ export function MessageAttachment({
         <AvatarFallback>JD</AvatarFallback>
       </Avatar>
       <div className="flex flex-col max-w-full">
-        <div className="text-xs text-gray-600 mb-1">
+        <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
           <p className="font-mono font-semibold">
             {firstName + " " + lastName}
           </p>
@@ -240,7 +240,7 @@ export function MessageAttachment({
               onContextMenu={(e) => e.preventDefault()}
               src={fileUrl}
               alt="attachment"
-              className="max-w-[250px] max-h-[250px] object-cover rounded-lg"
+              className="max-w-[250px] min-w-[150px] max-h-[250px] object-cover rounded-lg"
             />
             {reactions && reactions.length > 0 && (
               <div className="absolute -bottom-3 right-0 bg-green-400 rounded-full px-2 space-x-1 text-sm py-1 flex flex-row justify-center items-center text-xs">
@@ -286,7 +286,7 @@ export function MessageSelfAttachment({
               onContextMenu={(e) => e.preventDefault()}
               src={fileUrl}
               alt="attachment"
-              className="max-w-[250px] max-h-[250px] object-cover rounded-lg"
+              className="max-w-[250px] min-w-[150px] max-h-[250px] object-cover rounded-lg"
             />
             {reactions && reactions.length > 0 && (
               <div className="absolute -bottom-3 left-0 bg-gray-200 rounded-full px-2 space-x-1 text-sm py-1 flex flex-row justify-center items-center text-xs">
@@ -414,14 +414,14 @@ const MessageBubbleEventWrapper = ({
             <DrawerFooter className="grid grid-cols-3">
               <Button
                 variant="ghost"
-                className="space-x-2 flex justify-center items-center"
+                className="space-x-2 flex justify-center items-center dark:text-gray-200"
               >
                 <Copy className="w-5 h-5" />
                 <span>Copy</span>
               </Button>
               <Button
                 variant="ghost"
-                className="space-x-2 flex justify-center items-center"
+                className="space-x-2 flex justify-center items-center dark:text-gray-200"
               >
                 {isSelf ? (
                   <>
@@ -437,7 +437,7 @@ const MessageBubbleEventWrapper = ({
               </Button>
               <Button
                 variant="ghost"
-                className="space-x-2 flex justify-center items-center"
+                className="space-x-2 flex justify-center items-center dark:text-gray-200"
               >
                 <MessageSquareOff className="w-5 h-5" />
                 {isSelf ? <span>Unsend</span> : <span>Remove</span>}

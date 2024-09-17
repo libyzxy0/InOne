@@ -60,10 +60,10 @@ export default function Login() {
   }, [user]);
 
   return (
-    <div className="flex items-center justify-center h-screen w-full bg-white">
+    <div className="flex items-center justify-center h-screen w-full bg-white dark:bg-[#0f0f0f]">
       <div className="max-w-md w-full px-7">
         <div className="text-center">
-          <h1 className="text-2xl font-mono font-semibold">Login | InOne</h1>
+          <h1 className="text-2xl font-mono font-semibold dark:text-white">Login | InOne</h1>
         </div>
 
         <div className="mt-16">
@@ -74,11 +74,12 @@ export default function Login() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username / Email</FormLabel>
+                    <FormLabel className="dark:text-white">Username / Email</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="libyzxy0 / janlibydelacosta@gmail.com"
                         {...field}
+                        className="dark:text-white"
                       />
                     </FormControl>
                     <FormMessage />
@@ -90,12 +91,13 @@ export default function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel className="dark:bg-[#0f0f0f]">Password</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
                         placeholder="Mypassword@123"
                         {...field}
+                        className="dark:text-white"
                       />
                     </FormControl>
                     <FormMessage />
@@ -111,14 +113,14 @@ export default function Login() {
               </Button>
             </form>
           </Form>
-          <p className="text-sm pt-5 text-center">
+          <p className="text-sm pt-5 text-center dark:text-white">
             Don't have an account?{" "}
             <Link to="/new-account" className="text-green-400 hover:underline">
               {"Let's Create"}
             </Link>
           </p>
           <div className="flex items-center flex-col w-full mt-8">
-            <h1 className="text-xl font-mono mb-8">OR</h1>
+            <h1 className="text-xl font-mono mb-8 dark:text-white">OR</h1>
 
             <Button
               type="button"

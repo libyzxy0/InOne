@@ -146,7 +146,7 @@ export default function Chat() {
 
   return (
     <div
-      className={`flex flex-col ${messages.length > 0 && "h-screen"} bg-white`}
+      className={`flex flex-col ${messages.length > 0 && "h-screen"} bg-gray-50 dark:bg-[#0f0f0f]`}
     >
       <Header thread={threadID} onChangeThread={setThreadID} />
 

@@ -142,10 +142,10 @@ export default function Signup() {
   }, [user]);
 
   return (
-    <div className="flex items-center justify-center w-full bg-white">
+    <div className="flex items-center justify-center w-full bg-white dark:bg-[#0f0f0f]">
       <div className="max-w-md w-full px-7 pt-16 pb-16">
         <div className="text-center">
-          <h1 className="text-2xl font-mono font-semibold">
+          <h1 className="text-2xl font-mono font-semibold dark:text-white">
             Create Account | InOne
           </h1>
         </div>
@@ -270,7 +270,7 @@ export default function Signup() {
               </Button>
             </form>
           </Form>
-          <p className="text-sm py-4 text-center">
+          <p className="text-sm py-4 text-center dark:text-white">
             By continuing, you confirm that you have read and agreed to our{" "}
             <Link to="/terms" className="underline text-green-400">
               Terms of Service
@@ -281,14 +281,14 @@ export default function Signup() {
             </Link>
             .
           </p>
-          <p className="text-sm pt-4 text-center">
+          <p className="text-sm pt-4 text-center dark:text-white">
             Have an account?{" "}
             <Link to="/" className="text-green-400 hover:underline">
               {"Let's Login"}
             </Link>
           </p>
           <div className="flex items-center flex-col w-full mt-8">
-            <h1 className="text-xl font-mono mb-8">OR</h1>
+            <h1 className="text-xl font-mono mb-8 dark:text-white">OR</h1>
 
             <Button
               type="button"
