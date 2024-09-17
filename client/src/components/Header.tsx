@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   DropdownMenu,
@@ -12,7 +12,7 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Search } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 import axios from "axios";
 import { API_BASE } from "@/constants";
 import Cookies from "js-cookie";
@@ -29,7 +29,7 @@ type ThreadType = {
 
 export function Header({ onChangeThread, thread }: Props) {
   const [threadList, setThreadList] = useState<ThreadType[] | null>(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const handleThreadFetch = async () => {
       const response = await axios.get(API_BASE + "/get-all-thread");
@@ -50,7 +50,9 @@ export function Header({ onChangeThread, thread }: Props) {
           <DropdownMenuTrigger asChild>
             <div className="font-bold text-lg text-gray-800 font-mono">
               <i className="text-green-400 capitalize">
-                {threadList && threadList.find((t) => t.id === thread)?.name}
+                {threadList
+                  ? threadList.find((t) => t.id === thread)?.name
+                  : "An error occurred"}
               </i>
             </div>
           </DropdownMenuTrigger>
@@ -62,19 +64,28 @@ export function Header({ onChangeThread, thread }: Props) {
               onValueChange={onChangeThread}
             >
               {threadList &&
-                threadList.map((thread, index) => (
-                  <DropdownMenuRadioItem key={index} value={thread.id}>
-                    {thread.name}
+                threadList.map((threadData, index) => (
+                  <DropdownMenuRadioItem
+                    key={index}
+                    value={threadData.id}
+                    className={`${threadData.id == thread && "font-mono font-semibold text-green-400"}`}
+                  >
+                    {threadData.name}
                   </DropdownMenuRadioItem>
                 ))}
             </DropdownMenuRadioGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => navigate("/new-thread")}
+              className="flex flex-row space-x-2 bg-green-400 text-white"
+            >
+              <CirclePlus className="h-4 w-4" />
+              <span className="font-mono font-semibold">Create Group</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </nav>
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="hidden md:block">
-          <Search className="w-5 h-5" />
-        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">

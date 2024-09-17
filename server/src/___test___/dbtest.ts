@@ -6,9 +6,11 @@ import {
 
 (async function () {
   const insert = await db.insert(threads).values({
-    name: "For testing",
-    photo: "https://http.cat/404", 
-    created_by: "eeb96127-10f4-4010-8468-735f59242403"
+    name: "General",
+    photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSE3B0KCeygLprFQitE_I1cqAd8tnXcg2nq37HdeyhgFvZoNBJFTUj_6FCV&s=10", 
+    isPrivate: false, 
+    description: "A general purpose thread.", 
+    created_by: "f595dfa0-fb7f-45fe-95b6-b66a22a768c9"
   }).returning({ id: threads.id
   })
   console.log(insert)

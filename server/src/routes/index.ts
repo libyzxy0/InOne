@@ -19,6 +19,7 @@ router.route("/").get((req: Request, res: Response) => {
 router.route("/login").post(userController.login);
 router.route("/register").post(userController.register);
 router.route("/get-session").get(userController.getSession);
+router.route("/verify-otp").post(userController.verifyOtp);
 
 /* Handle routes for thread controller */
 router.route("/new-thread").post(threadController.createThread);

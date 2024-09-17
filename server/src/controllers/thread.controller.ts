@@ -6,21 +6,28 @@ import db from "@/db/drizzle";
 import {
   threads
 } from "@/db/schema";
-
+import {
+  getTokenFromRequestHeaders,
+  getUserFromToken
+} from "@/utils";
 class ThreadController {
   async createThread(req: Request, res: Response) {
-    const token: string | null = getTokenFromRequestHeaders(req);
-    const user: User | null = await getUserFromToken(token);
     try {
       const {
         name, 
+        photo, 
+        description, 
         isPrivate
       } = req.body;
+      const token: string | null = getTokenFromRequestHeaders(req);
+      const user: User | null = await getUserFromToken(token);
 
       if (user) {
         await db.insert(threads).values({
           name,
           photo,
+          isPrivate, 
+          description, 
           created_by: user.id
         });
         res.status(200).json({

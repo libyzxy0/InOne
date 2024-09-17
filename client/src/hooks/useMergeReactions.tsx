@@ -17,7 +17,7 @@ export function useMergeReactions(reactions: ReactionType[]): ReturnType {
   const latestReactions = new Map<string, ReactionType>();
 
   reactions.forEach((reaction) => {
-    latestReactions.set(reaction.userID, reaction); 
+    latestReactions.set(reaction.userID, reaction);
   });
 
   const uniqueReactions = Array.from(latestReactions.values());
@@ -25,7 +25,8 @@ export function useMergeReactions(reactions: ReactionType[]): ReturnType {
   const reactionCounts: Record<string, number> = {};
 
   uniqueReactions.forEach((reaction) => {
-    reactionCounts[reaction.reaction] = (reactionCounts[reaction.reaction] || 0) + 1;
+    reactionCounts[reaction.reaction] =
+      (reactionCounts[reaction.reaction] || 0) + 1;
   });
 
   const topReaction = Object.keys(reactionCounts).reduce((a, b) =>
@@ -35,14 +36,14 @@ export function useMergeReactions(reactions: ReactionType[]): ReturnType {
   const filteredUniqueReactions = uniqueReactions.filter(
     (reaction, index, self) =>
       reaction.reaction === topReaction
-        ? self.findIndex(r => r.reaction === reaction.reaction) === index
-        : true
+        ? self.findIndex((r) => r.reaction === reaction.reaction) === index
+        : true,
   );
 
   return {
     length: uniqueReactions.length,
     uniqueReactions: filteredUniqueReactions,
     topReaction,
-    reactions, 
+    reactions,
   };
 }

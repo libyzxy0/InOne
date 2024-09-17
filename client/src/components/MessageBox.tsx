@@ -1,10 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Image, Paperclip, Send, ChevronRight, LoaderCircle } from "lucide-react";
+import {
+  Image,
+  Paperclip,
+  Send,
+  ChevronRight,
+  LoaderCircle,
+} from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useSocket } from "@/hooks/useSocket";
-import FileUpload from '@/components/FileUpload'
+import FileUpload from "@/components/FileUpload";
 
 export function MessageBox({ threadID }: { threadID: string }) {
   const token = Cookies.get("authtoken") ? Cookies.get("authtoken") : null;
@@ -18,7 +24,6 @@ export function MessageBox({ threadID }: { threadID: string }) {
 
   const handleSend = async () => {
     if (token) {
-   
       await sendMessage(
         {
           text: message !== "" ? message : null,
@@ -29,19 +34,22 @@ export function MessageBox({ threadID }: { threadID: string }) {
 
       /* Reset the message box */
       setMessage("");
-      setAttachmentUrl(null)
+      setAttachmentUrl(null);
       const textarea = textareaRef.current;
       textarea!.style.height = "auto";
     }
   };
-  
-  const handleUploadResponse = (data: { error: string | null; file_url: string | null; }) => {
-    setLoading(false)
-    if(!data.error) {
-      setAttachmentUrl(data.file_url)
+
+  const handleUploadResponse = (data: {
+    error: string | null;
+    file_url: string | null;
+  }) => {
+    setLoading(false);
+    if (!data.error) {
+      setAttachmentUrl(data.file_url);
     }
   };
-  
+
   useEffect(() => {
     if (message !== "") {
       setHideActions(true);
@@ -52,7 +60,7 @@ export function MessageBox({ threadID }: { threadID: string }) {
 
   useEffect(() => {
     const textarea = textareaRef.current;
-    
+
     const adjustHeight = () => {
       if (textarea !== null) {
         textarea!.style.height = "auto";
@@ -90,11 +98,20 @@ export function MessageBox({ threadID }: { threadID: string }) {
             <Paperclip className="w-5 h-5 text-gray-800" />
             <span className="sr-only">Attach file</span>
           </Button>
-          <FileUpload onUploadResponse={handleUploadResponse} onUploadStart={() => setLoading(true)}>
-          <Button variant="ghost" size="icon">
-            {loading ? <LoaderCircle className="w-5 h-5 animate-spin" /> : <Image className={`w-5 h-5 text-gray-800 ${attachmentUrl ? 'text-green-400' : 'text-gray-800'}`} />}
-            <span className="sr-only">Upload image</span>
-          </Button>
+          <FileUpload
+            onUploadResponse={handleUploadResponse}
+            onUploadStart={() => setLoading(true)}
+          >
+            <Button variant="ghost" size="icon">
+              {loading ? (
+                <LoaderCircle className="w-5 h-5 animate-spin" />
+              ) : (
+                <Image
+                  className={`w-5 h-5 text-gray-800 ${attachmentUrl ? "text-green-400" : "text-gray-800"}`}
+                />
+              )}
+              <span className="sr-only">Upload image</span>
+            </Button>
           </FileUpload>
         </div>
       )}

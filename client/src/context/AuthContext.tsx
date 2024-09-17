@@ -15,6 +15,7 @@ type AuthContextType = {
     username: string,
     email: string,
     password: string,
+    photo: string | null,
   ) => Promise<void>;
   logout: () => void;
 };
@@ -88,6 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     username: string,
     email: string,
     password: string,
+    photo: string | null,
   ): Promise<void> => {
     try {
       const response = await axios.post(API_BASE + "/register", {
@@ -96,6 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         username,
         email,
         password,
+        avatar_url: photo,
       });
       console.log("[AuthMessage]:", response.data.message);
       setError("");

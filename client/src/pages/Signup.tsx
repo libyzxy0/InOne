@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
+import { API_BASE } from "@/constants";
 
 const formSchema = z.object({
   firstName: z.string().min(1, {
@@ -58,11 +59,14 @@ const formSchema = z.object({
     .regex(/[\W_]/, {
       message: "Password must include at least one special character.",
     }),
+  photo: z.string().optional(),
 });
 
-export default function Login() {
+export default function Signup() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [fileloading, setFileLoading] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -71,15 +75,55 @@ export default function Login() {
       username: "",
       email: "",
       password: "",
+      photo: "",
     },
   });
 
   const { register, user } = useAuth();
 
+  const BASE_UPLOAD_API = `${API_BASE}/file-api`;
+
+  const handlePhotoChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setFileLoading(true);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch(`${BASE_UPLOAD_API}/upload`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to upload the file");
+        }
+
+        const result = await response.json();
+        setPhotoPreview(result.file_url);
+        form.setValue("photo", result.file_url);
+      } catch (error) {
+        toast.error("Error uploading profile picture");
+      } finally {
+        setFileLoading(false);
+      }
+    }
+  };
+
   async function onSubmit(v: z.infer<typeof formSchema>) {
     try {
       setLoading(true);
-      await register(v.firstName, v.lastName, v.username, v.email, v.password);
+      await register(
+        v.firstName,
+        v.lastName,
+        v.username,
+        v.email,
+        v.password,
+        v.photo ? v.photo : null,
+      );
       toast("✅ Successfully created account!");
       setTimeout(() => {
         navigate("/");
@@ -158,8 +202,26 @@ export default function Login() {
               <div>
                 <Label>Profile Picture</Label>
                 <div>
-                  <Input type="file" />
+                  <Input
+                    type="file"
+                    onChange={handlePhotoChange}
+                    disabled={fileloading}
+                  />
                 </div>
+                {fileloading && (
+                  <p className="text-xs text-gray-600 mt-1 animate-pulse">
+                    Uploading...
+                  </p>
+                )}
+                {photoPreview && (
+                  <div className="mt-2">
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      className="w-32 h-32 object-cover rounded"
+                    />
+                  </div>
+                )}
               </div>
 
               <FormField
@@ -195,7 +257,11 @@ export default function Login() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full font-mono font-semibold">
+              <Button
+                type="submit"
+                className="w-full font-mono font-semibold"
+                disabled={loading || fileloading}
+              >
                 {loading ? (
                   <LoaderCircle className="h-5 w-5 animate-spin" />
                 ) : (

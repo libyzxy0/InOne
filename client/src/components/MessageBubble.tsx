@@ -1,7 +1,7 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 /* Tenks to this f*cking library https://usehooks.com/uselongpress 🙏 */
-import { useLongPress } from "@uidotdev/usehooks"
+import { useLongPress } from "@uidotdev/usehooks";
 
 import {
   Copy,
@@ -151,6 +151,7 @@ export function Message({
           <AvatarImage
             src={avatarUrl ? avatarUrl : "https://http.cat/404"}
             alt={firstName || "Avatar"}
+            className="object-cover"
           />
           <AvatarFallback>JD</AvatarFallback>
         </Avatar>
@@ -217,6 +218,7 @@ export function MessageAttachment({
         <AvatarImage
           src={avatarUrl ? avatarUrl : "https://http.cat/404"}
           alt={firstName || "Avatar"}
+          className="object-cover"
         />
         <AvatarFallback>JD</AvatarFallback>
       </Avatar>
@@ -321,11 +323,12 @@ const MessageBubbleEventWrapper = ({
   const token = Cookies.get("authtoken");
   const [popup, setPopup] = useState(false);
   const { makeReact } = useReaction(threadID);
-  
+
   const bindLongPress = useLongPress(
     () => {
       setPopup(true);
-    }, { threshold: 400 }
+    },
+    { threshold: 400 },
   );
 
   const makeReaction = async (reaction: string) => {
