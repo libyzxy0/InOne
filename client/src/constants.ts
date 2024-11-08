@@ -1,5 +1,5 @@
-const HOSTED_SERVER = "https://inone-server.onrender.com/api/v1";
-const HOSTED_SOCKET = "wss://inone-server.onrender.com";
+const HOSTED_SERVER = "https://inone-production.up.railway.app/api/v1";
+const HOSTED_SOCKET = "wss://inone-production.up.railway.app";
 
 /* API BASE URL */
 
